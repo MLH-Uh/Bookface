@@ -7,9 +7,11 @@
 <body>
 	Howdy, world!
 	<% messages.forEach(m => { %>
-		<img class="avatar" src="<%= m.avatar %>">
+	<div class="container">
+  <img class="avatar" src="<%= m.avatar %>">
 		<p class="name"><%= m.name %></p>
 		<p class="content"><%= m.content %></p>
+</div>
 	<% }); %>
 </body>
 </html>
@@ -24,11 +26,7 @@
 
 <h2>Chat Messages</h2>
 
-<div class="container">
-  <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:100%;">
-  <p>wertyu</p>
-  <span class="time-right">11:00</span>
-</div>
+
 
 <div class="container darker">
   <img src="/w3images/avatar_g2.jpg" alt="Avatar" class="right" style="width:100%;">
