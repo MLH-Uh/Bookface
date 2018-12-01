@@ -3,11 +3,32 @@
 <head>
 	<title>Bookface</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
+  <script id="message-template" type="text/template">
+    <%- msgtemplate %>
+  </script>
+  <script src = "/socket.io/socket.io.js"></script>
+  <script src="ejs.min.js"></script>
+  <script>
+    onload = ()=>{
+      let socket = io.connect('http://localhost:3000');
+      socket.on('connect', data => {
+        socket.emit('join', 'Suh dude from client!');
+      });
+
+      let template = document.getElementById("message-template").innerHTML;
+      socket.on('message', data => {
+        document.getElementById("message-display").innerHTML += ejs.render(template,{m:data});
+        // alert(data);
+      });
+    };
+  </script>
 </head>
 <body>
 	Howdy, world!
-	<% messages.forEach(m => { %>
-  	<% include message.ejs %>
-	<% }); %>
+  <div id="message-display">
+    <% messages.forEach(m => { %>
+      <% include message.ejs %>
+    <% }); %>
+  </div>
 </body>
 </html>
