@@ -9,6 +9,10 @@ body {
     padding: 0 20px;
 }
 
+#message-display {
+    overflow-y:scroll;
+}
+
 .container {
     border: 2px solid #dedede;
     background-color: #f1f1f1;
