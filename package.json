@@ -19,6 +19,7 @@
   "dependencies": {
     "ejs": "^2.6.1",
     "express": "^4.16.4",
-    "facebook-chat-api": "^1.6.0"
+    "facebook-chat-api": "^1.6.0",
+    "socket.io": "^2.2.0"
   }
 }
