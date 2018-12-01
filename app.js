@@ -11,7 +11,7 @@ const login = require('facebook-chat-api');
 let messages = [
 	{name: "Oof", content: "woot", avatar:"https://i.imgur.com/VWcKTrh.jpg"},
 	{name: "Oof", content: "boot", avatar:"https://i.imgur.com/VWcKTrh.jpg"},
-	{name: "Oof", content: "doot", avatar:"https://i.imgur.com/VWcKTrh.jpg"}
+	{name: "Oof", content: "doot", avatar:"http://www.veggieonapenny.com/wp-content/uploads/2013/11/vegan-cheese-3-1024x731.jpg"}
 ];
 
 const express = require('express')
