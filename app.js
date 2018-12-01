@@ -14,32 +14,26 @@ let messages = [
 	{name: "Oof", content: "doot", avatar:"http://www.veggieonapenny.com/wp-content/uploads/2013/11/vegan-cheese-3-1024x731.jpg"}
 ];
 
-let msgtemplate;
-fs.readFile('views/message.ejs', 'utf-8', (err, tem) => {
-	console.log(`Found template\n${tem}`);
-	msgtemplate = tem;
-});
-
-fs.exists("appstate.json", (q) => {
-	let creds;
-	if (q){ 
-		console.log("found creds");
-		creds = require('./appstate.json');
-	} else {
-		console.log("no creds");
-		creds = {email: token.email, password: token.password};
+const msgtemplate = fs.readFileSync('views/message.ejs', 'utf-8');
+let creds = {email: token.email, password: token.password};
+if (fs.existsSync('appstate.json')) {
+	console.log("found creds");
+	creds = {appState:JSON.parse(fs.readFileSync('appstate.json','utf8'))};
+}
+login(creds, (err, api) => {
+	if (err) {
+		console.error(err);
+		process.exit();
 	}
-	// login(creds, (err, api) => {
-	// 	if (err) return console.error(err);
-	// 	api.listen((err, message) => {
-	// 		console.log(message.threadID);
-	//         api.sendMessage('suh dude', message.threadID);
-	//     });
-	//     fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
-	// });
+	api.listen((err, message) => {
+		console.log(`hit from ${message.threadID}`);
+        // api.sendMessage('suh dude', message.threadID);
+    });
+    fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
 });
 
-app	.use(express.static(path.join(__dirname, 'public')))
+app	
+	.use(express.static(path.join(__dirname, 'public')))
 	.set('views', path.join(__dirname, 'views'))
 	.set('view engine', 'ejs')
 	.get('/', (req, res) => {
@@ -59,6 +53,7 @@ function addMessage(msg) {
 setInterval(()=>{
 	addMessage({name:"Dom", content: "They did surgery on a grape", avatar: "https://i.imgur.com/JsqkGWc.jpg"});
 },2000);
+
 // api.getThreadHistory("100010346405871",5, undefined, (err, hist) => {
 // 	messages.push({name:"Dom", content: hist[0].body, avatar: "https://i.imgur.com/JsqkGWc.jpg"});
 // });
