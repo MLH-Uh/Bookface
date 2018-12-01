@@ -8,8 +8,6 @@ const io = require('socket.io')(server);
 const token = require('./token.json');
 const port = 3000
 
-
-
 let messages = [
 	{name: "Oof", content: "woot", avatar:"https://i.imgur.com/VWcKTrh.jpg"},
 	{name: "Oof", content: "boot", avatar:"https://i.imgur.com/VWcKTrh.jpg"},
@@ -18,23 +16,29 @@ let messages = [
 
 let msgtemplate;
 fs.readFile('views/message.ejs', 'utf-8', (err, tem) => {
+	console.log(`Found template\n${tem}`);
 	msgtemplate = tem;
 });
 
-let creds;
-if (fs.exists("appstate.json")) { 
-	creds = require('./appstate.json');
-} else {
-	creds = {email: token.email, password: token.password};
-}
-login(creds, (err, api) => {
-	if (err) return console.error(err);
-	api.listen((err, message) => {
-		console.log(message.threadID);
-        api.sendMessage('suh dude', message.threadID);
-    });
-    fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
+fs.exists("appstate.json", (q) => {
+	let creds;
+	if (q){ 
+		console.log("found creds");
+		creds = require('./appstate.json');
+	} else {
+		console.log("no creds");
+		creds = {email: token.email, password: token.password};
+	}
+	// login(creds, (err, api) => {
+	// 	if (err) return console.error(err);
+	// 	api.listen((err, message) => {
+	// 		console.log(message.threadID);
+	//         api.sendMessage('suh dude', message.threadID);
+	//     });
+	//     fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
+	// });
 });
+
 app	.use(express.static(path.join(__dirname, 'public')))
 	.set('views', path.join(__dirname, 'views'))
 	.set('view engine', 'ejs')
@@ -42,23 +46,14 @@ app	.use(express.static(path.join(__dirname, 'public')))
 		res.render('index', {messages: messages, msgtemplate: msgtemplate})
 
 	})
-	// .get('/search', async (req, res) => {
-	//   console.log(`Searching for '${req.query.query}'`);
-	//   let search = await client.search({
-	//     index: 'serviceproviders',
-	//     type: 'provider',
-	//     body: {
-	//       query: {
-	//         regexp: {'desc': req.query.query || ''}
-	//       }
-	//     }
-	//   });
-	//   res.render('pages/search', {search: search, query: req.query.query});
-	// })
-
+	.get('/reset', (req, res) => {
+		messages = [];
+		res.send("woot");
+	})
 
 function addMessage(msg) {
 	messages.push(msg); 
+	console.log("sending");
 	io.emit('message', msg)
 }
 setInterval(()=>{
