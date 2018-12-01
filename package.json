@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MLH-Uh/Bookface#readme",
   "dependencies": {
+    "ejs": "^2.6.1",
     "express": "^4.16.4",
     "facebook-chat-api": "^1.6.0"
   }
