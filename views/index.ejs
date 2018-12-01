@@ -8,8 +8,8 @@
 	Howdy, world!
 	<% messages.forEach(m => { %>
 		<img class="avatar" src="<%= m.avatar %>">
-		<p><%= m.name %></p>
-		<p><%= m.content %></p>
+		<p class="name"><%= m.name %></p>
+		<p class="content"><%= m.content %></p>
 	<% }); %>
 </body>
 </html>
