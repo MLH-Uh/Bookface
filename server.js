@@ -16,6 +16,7 @@ server.pushMessage = (msg) => {
 
 server.routes = {};
 server.routes.index = (req, res) => {
+	console.log('[Server] Routing index request');
 	console.log(`Params:${util.inspect(req.params)}\nQuery:${util.inspect(req.query)}`);
 	res.render('index', {
 		messages:[],// messages,
@@ -23,13 +24,22 @@ server.routes.index = (req, res) => {
 	});
 };
 
-server.routes.thread = (req, res) => {
+server.routes.thread = async (req, res) => {
+	console.log('[Server] Routing thread request');
 	console.log(`Params:${util.inspect(req.params)}\nQuery:${util.inspect(req.query)}`);
-	// let id = req.params.id;
-	res.send("woot");
+	try {
+		res.render('thread', {
+			messages: await server.app.facebook.getThreadMessages(req.params.id),
+			msgtemplate: msgtemplate,
+			threadID: req.params.id
+		});
+	} catch (e) {
+		res.send("503");
+	}
 };
 
 server.init = (app, port) => {
+	console.log('[Server] Initializing...');
 	server.app = app;
 	app.server = server;
 	server.port = port;
@@ -41,17 +51,24 @@ server.init = (app, port) => {
 		.get('/thread/:id', server.routes.thread);
 
 	socket.on('connection', client => {
-		console.log('Client socket connected...');
+		console.log('[Socket] Client socket connected...');
 		client.on('join', data => {
-			console.log(data);
+			console.log(`[Socket] Received ${data}`);
 		});
 		client.on('message', data => {
-			console.log(`received ${data}`);
+			console.log(`[Socket] Message send request ${util.inspect(data)}`);
+			server.app.facebook.sendMessage(data.body, data.threadID);
+			server.app.facebook.onMessage(null, {
+				threadID: data.threadID, 
+				body: data.body,
+				senderID: server.app.facebook.api.getCurrentUserID(),
+				timestamp: new Date().getTime()
+			});
 		});
 	});
 
 
-	service.listen(server.port, () => console.log(`Listening on port ${server.port}`));
+	service.listen(server.port, () => console.log(`[Server] Listening on port ${server.port}`));
 	return server;
 };
 

@@ -2,23 +2,28 @@
 <html>
 <head>
 	<title>Bookface</title>
-	<link rel="stylesheet" type="text/css" href="main.css" />
+	<link rel="stylesheet" type="text/css" href="/main.css" />
   <script id="message-template" type="text/template">
     <%- msgtemplate %>
   </script>
   <script src = "/socket.io/socket.io.js"></script>
-  <script src="ejs.min.js"></script>
+  <script src="/ejs.min.js"></script>
   <script>
     onload = ()=>{
+      const threadID = <%= threadID %>;
       let socket = io.connect('http://localhost:3000');
       socket.on('connect', data => {
-        socket.emit('join', 'Suh dude from client!');
+        socket.emit('join', '[Client=>Socket] Suh dude from client!');
       });
 
       let template = document.getElementById("message-template").innerHTML;
+      let msgContainer = document.getElementById("message-display")
       socket.on('message', data => {
-        document.getElementById("message-display").innerHTML += ejs.render(template,{m:data});
-        // alert(data);
+        let isScrolled = msgContainer.scrollHeight - msgContainer.clientHeight <= msgContainer.scrollTop + 1;
+        msgContainer.innerHTML += ejs.render(template,{m:data});
+        if (isScrolled) {
+          msgContainer.scrollTop = msgContainer.scrollHeight - msgContainer.clientHeight
+        }
       });
 
       let txtbox = document.getElementById("textbox")
@@ -26,14 +31,16 @@
         key.preventDefault();
         if (key.keyCode == 13) {
           console.log("yeeeeet");
-          socket.emit('message', txtbox.value);
+          socket.emit('message', {body: txtbox.value, threadID: threadID});
         }
       });
+
+      msgContainer.scrollTop = msgContainer.scrollHeight - msgContainer.clientHeight
     };
   </script>
 </head>
 <body>
-	Howdy, world!
+  Bookface
   <div id="message-display">
     <% messages.forEach(m => { %>
       <% include message.ejs %>
